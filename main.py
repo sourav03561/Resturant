@@ -15,13 +15,13 @@ app = FastAPI()
 
 restaurants = []
 
-user_ref = db.collection(u'User')
-docs = user_ref.stream()
 
 @app.get("/print_all_menu/")
 async def print_all_menu():
         # Reference to the User collection
         # List to store all menu items for each restaurant
+        user_ref = db.collection(u'User')
+        docs = user_ref.stream()
         all_menu = []
 
         # Iterate over documents and add menu items to the list
@@ -40,6 +40,8 @@ async def print_all_menu():
 # done
 @app.get("/restaurant/menu/{restaurant_name}")
 async def get_menu(restaurant_name: str):
+    user_ref = db.collection(u'User')
+    docs = user_ref.stream()
     for restaurant in docs:
         restaurant_data = restaurant.to_dict()
         if restaurant_data.get("name") == restaurant_name:
@@ -51,6 +53,8 @@ async def get_menu(restaurant_name: str):
 @app.get("/dish/search/")
 async def search_dish(dish_name: str = Query(..., title="Dish Name")):
     try:
+        user_ref = db.collection(u'User')
+        docs = user_ref.stream()
         results = []
         for doc in docs:
             restaurant = doc.to_dict()
@@ -70,6 +74,8 @@ async def search_dish(dish_name: str = Query(..., title="Dish Name")):
 # done
 @app.get("/restaurants/best/")
 async def best_restaurants(latitude: float = Query(...), longitude: float = Query(...), radius: float = Query(10)):
+    user_ref = db.collection(u'User')
+    docs = user_ref.stream()
     results = []
     for restaurant in docs:
         # Simple distance calculation, assuming coordinates are in degrees
@@ -89,6 +95,8 @@ async def best_restaurants(latitude: float = Query(...), longitude: float = Quer
 # done
 @app.post("/restaurant/add/")
 async def add_restaurant(restaurant_data: Dict[str, Any]):
+    user_ref = db.collection(u'User')
+    docs = user_ref.stream()
     restaurants.append(restaurant_data)
     for record in restaurants:
         doc_ref = db.collection(u'User').document(record['name'])
