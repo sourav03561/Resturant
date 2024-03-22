@@ -130,7 +130,23 @@ async def get_restaurants_by_category(category: str):
         })
     
     return restaurants
-        
+#Feature 6:best seller dish of a particular resturant 
+@app.get("/restaurant/best_seller/{restaurant_name}")
+async def get_best_seller(restaurant_name: str):
+    user_ref = db.collection(u'User')
+    query = user_ref.where(u'name', u'==', restaurant_name)
+    docs = query.stream()
+
+    for doc in docs:
+        restaurant_data = doc.to_dict()
+        best_seller = restaurant_data.get("best_seller")
+        if best_seller:
+            return {
+                "restaurant_name": restaurant_name,
+                "best_seller": best_seller
+            }
+    
+    return {"message": "Restaurant not found or best seller not available"}
 # Endpoint to add a new restaurant
 # done
 @app.post("/restaurant/add/")
