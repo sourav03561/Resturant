@@ -10,6 +10,7 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 from fastapi import FastAPI, Query
 from typing import List, Dict, Any
+from datetime import time, datetime
 
 app = FastAPI()
 
@@ -89,7 +90,29 @@ async def best_restaurants(latitude: float = Query(...), longitude: float = Quer
             })
     results.sort(key=lambda x: x["rating"], reverse=True)
     return results
+# Feature 4: get opening and closing time of a particular resturant
+@app.get("/restaurant/timing/{restaurant_name}")
+async def get_restaurant_timing(restaurant_name: str):
+    user_ref = db.collection(u'User')
+    query = user_ref.where(u'name', u'==', restaurant_name)
+    docs = query.stream()
 
+    for doc in docs:
+        restaurant_data = doc.to_dict()
+        opening_time_str = restaurant_data.get("opening_time")
+        closing_time_str = restaurant_data.get("closing_time")
+        
+        # Convert opening_time and closing_time to time objects
+        opening_time = datetime.strptime(opening_time_str, "%H:%M").time() if opening_time_str else None
+        closing_time = datetime.strptime(closing_time_str, "%H:%M").time() if closing_time_str else None
+        
+        return {
+            "restaurant_name": restaurant_name,
+            "opening_time": opening_time.strftime("%H:%M") if opening_time else "N/A",
+            "closing_time": closing_time.strftime("%H:%M") if closing_time else "N/A"
+        }
+    
+    return {"message": "Restaurant not found"}
 
 # Endpoint to add a new restaurant
 # done
