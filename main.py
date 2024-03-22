@@ -113,7 +113,24 @@ async def get_restaurant_timing(restaurant_name: str):
         }
     
     return {"message": "Restaurant not found"}
-
+# feature 5: get resturant by category
+@app.get("/restaurants/")
+async def get_restaurants_by_category(category: str):
+    user_ref = db.collection(u'User')
+    query = user_ref.where(u'category', u'==', category)
+    docs = query.stream()
+    
+    restaurants = []
+    for doc in docs:
+        restaurant_data = doc.to_dict()
+        restaurants.append({
+            "name": restaurant_data.get("name"),
+            "menu": restaurant_data.get("menu"),
+            "category": restaurant_data.get("category")
+        })
+    
+    return restaurants
+        
 # Endpoint to add a new restaurant
 # done
 @app.post("/restaurant/add/")
