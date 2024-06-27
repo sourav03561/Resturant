@@ -30,10 +30,14 @@ async def print_all_menu():
             restaurant_data = doc.to_dict()
             menu = restaurant_data.get("menu", [])
             Location = restaurant_data.get("Location", [])
+            Address = restaurant_data.get("Address", [])
+            rating = restaurant_data.get("rating", [])
             restaurant_menu = {
                 "restaurant_name": restaurant_data.get("name", ""),
                 "menu": menu,
-                "Location": Location
+                "Location": Location,
+                "Address": Address,
+                "rating": rating,
             }
             all_menu.append(restaurant_menu)
 
